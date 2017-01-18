@@ -64,6 +64,7 @@ namespace NetCore
                 .DisableHttpsRequirement()
                 .AddEphemeralSigningKey();
 
+            services.AddSwaggerGen();
         }
 
 
@@ -81,6 +82,11 @@ namespace NetCore
             app.UseOpenIddict();
 
             app.UseMvc();
+
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui assets (HTML, JS, CSS etc.)
+            app.UseSwaggerUi();
         }
 
         public async Task BuildUser(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)

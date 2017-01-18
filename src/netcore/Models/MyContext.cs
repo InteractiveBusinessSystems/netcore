@@ -14,7 +14,16 @@ namespace NetCore.Models
 
         public MyContext(DbContextOptions<MyContext> context) : base(context)
         {
+            
+        }
 
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<Class>().HasMany(x => x.Students)
+                .WithOne()
+                .HasForeignKey(x => x.ClassId);
         }
     }
 }
