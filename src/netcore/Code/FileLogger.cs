@@ -28,6 +28,50 @@ namespace NetCore.Code
         }
     }
 
+    public class FileLogger : ILogger
+    {
+        private string _location;
+        public LogLevel _minLogLevel;
+
+        private static object LogLock = new object();
+
+        public FileLogger(string location, LogLevel minLogLevel)
+        {
+            _location = location;
+            _minLogLevel = minLogLevel;
+        }
+
+        public IDisposable BeginScope<TState>(TState state)
+        {
+            //FLScopeStack.Push(state);
+            //return new FLScope()
+            //{
+            //    State = state
+            //};
+            return null;
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            return true;
+        }
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        {
+            if (logLevel >= _minLogLevel)
+                Task.Run(() => DoLog(formatter(state, exception)));
+        }
+
+        private void DoLog(string msg)
+        {
+            lock (LogLock)
+            {
+                File.AppendAllText(_location, msg + Environment.NewLine);
+            }
+
+        }
+    }
+
     public class FLScopeStack
     {
         static Stack<object> stack = new Stack<object>();
@@ -77,47 +121,5 @@ namespace NetCore.Code
 
     }
 
-    public class FileLogger : ILogger
-    {
-        private string _location;
-        public LogLevel _minLogLevel;
-
-        private static object LogLock = new object();
-
-        public FileLogger(string location, LogLevel minLogLevel)
-        {
-            _location = location;
-            _minLogLevel = minLogLevel;
-        }
-
-        public IDisposable BeginScope<TState>(TState state)
-        {
-            //FLScopeStack.Push(state);
-            //return new FLScope()
-            //{
-            //    State = state
-            //};
-            return null;
-        }
-
-        public bool IsEnabled(LogLevel logLevel)
-        {
-            return true;
-        }
-
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
-        {
-            if (logLevel >= _minLogLevel)
-                Task.Run(() => DoLog(formatter(state, exception)));
-        }
-
-        private void DoLog(string msg)
-        {
-            lock (LogLock)
-            {
-                File.AppendAllText(_location, msg + Environment.NewLine);
-            }
-
-        }
-    }
+    
 }

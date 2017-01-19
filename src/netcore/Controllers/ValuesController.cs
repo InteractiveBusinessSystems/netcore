@@ -23,14 +23,16 @@ namespace NetCore.Controllers
         }
         // GET api/values
         [HttpGet]
-        public async Task<IEnumerable<string>> Get()
+        public async Task<IActionResult> Get()
         {
             _logger.LogError("this is an error");
+
             var classes = await _context.Classes
                 .Include(y => y.Students)
                 .ToListAsync();
             var cl = User.Claims.ToList();
-            return new string[] { "value1", "value2" };
+
+            return Ok(classes);
         }
 
         // GET api/values/5
@@ -48,7 +50,7 @@ namespace NetCore.Controllers
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public void Put([FromRoute] int id, [FromBody]string value)
+        public void Put(int id, [FromBody]string value)
         {
         }
 
